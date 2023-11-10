@@ -1,6 +1,12 @@
 // Wrap all code that interacts with the DOM in a call to jQuery to ensure that
 // the code isn't run until the browser has finished rendering all the elements
 // in the html.
+const currentDayEl = $("#currentDay");
+const timeBlockEl = $(".time-block");
+const descriptionEl = $(".description");
+const hourEl = $(".hour");
+const rightNow = dayjs().format("dddd, MMMM DD YYYY");
+
 $(function () {
   // TODO: Add a listener for click events on the save button. This code should
   // use the id in the containing time-block as a key to save the user input in
@@ -8,16 +14,41 @@ $(function () {
   // function? How can DOM traversal be used to get the "hour-x" id of the
   // time-block containing the button that was clicked? How might the id be
   // useful when saving the description in local storage?
-  //
+  timeBlockEl.on("click", handleSaveEvent);
+  function handleSaveEvent(event) {
+    event.preventDefault();
+
+    const descriptionText = $(this).children("textarea").val();
+
+    localStorage.setItem($(this).attr("id"), descriptionText);
+  }
+
   // TODO: Add code to apply the past, present, or future class to each time
   // block by comparing the id to the current hour. HINTS: How can the id
   // attribute of each time-block be used to conditionally add or remove the
   // past, present, and future classes? How can Day.js be used to get the
   // current hour in 24-hour time?
-  //
+  var curHour = dayjs().hour();
+  for (var i = 9; i < 18; i++) {
+    const parentId = $("#hour-" + i);
+    const textArea = parentId.children("textarea");
+    const data = localStorage.getItem("hour-" + i);
+    textArea.val(data);
+    if (curHour > i) {
+      textArea.addClass("past");
+    } else if (i > curHour) {
+      textArea.addClass("future");
+    } else {
+      textArea.addClass("present");
+    }
+  }
   // TODO: Add code to get any user input that was saved in localStorage and set
   // the values of the corresponding textarea elements. HINT: How can the id
   // attribute of each time-block be used to do this?
   //
   // TODO: Add code to display the current date in the header of the page.
+  function displayTime() {
+    currentDayEl.text(rightNow);
+  }
+  displayTime();
 });
